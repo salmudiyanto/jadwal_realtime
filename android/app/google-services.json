@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "651538870844",
+    "firebase_url": "https://realtime-schedule-b941f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "realtime-schedule-b941f",
+    "storage_bucket": "realtime-schedule-b941f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:651538870844:android:b5020b617f13af2087c939",
+        "android_client_info": {
+          "package_name": "com.example.jadwal_realtime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "651538870844-r6j6n1ckokhgtj7vqa22k035kdskfp8q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHwzQF5Fgmr601AvanxB1It-HccUHW7o4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "651538870844-r6j6n1ckokhgtj7vqa22k035kdskfp8q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "651538870844-qaq2q3pueiqv3c3umqh8sed3vmcsajqv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.jadwalRealtime"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
