@@ -46,7 +46,7 @@ void callbackDispatcher() {
 
 Future<void> _checkSchedules() async {
   final now = DateTime.now();
-
+  print('mungkin object');
   // Mencari dokumen yang datetime-nya sama persis dengan sekarang
   final schedules = await FirebaseFirestore.instance
       .collection('schedules')

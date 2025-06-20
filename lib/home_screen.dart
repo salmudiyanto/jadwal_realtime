@@ -78,8 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
         .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
         .where('datetime', isLessThanOrEqualTo: now)
         .get();
-
     for (final doc in schedules.docs) {
+      print("stecu");
       NotificationService.scheduleNotification(
         id: doc.id.hashCode,
         title: 'Jadwal Sekarang: ${doc['title']}',
