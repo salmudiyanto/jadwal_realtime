@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:jadwal_realtime/notification_service.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:jadwal_realtime/background_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +31,83 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Future<void> _requestExactAlarmPermission() async {
+    try{
+      print("oioi");
+      if (await Permission.scheduleExactAlarm.request().isGranted) {
+        print('Izin exact alarm diberikan');
+      } else {
+        print('Izin ditolak, notifikasi mungkin tidak tepat waktu');
+      }
+    }catch(e){
+      print("error minta izin $e");
+    }
+  }
+
+  Future<void> _testNotification() async {
+    await NotificationService.showTestNotification();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _testNotification();
+    _requestExactAlarmPermission;
+    _initNotifications();
+    _startBackgroundTask();
+  }
+
+  Future<void> _initNotifications() async {
+    await NotificationService.initialize();
+
+    // Cek jadwal setiap kali app dibuka
+    _checkImmediateSchedules();
+  }
+
+  // final schedules = await FirebaseFirestore.instance
+  //     .collection('schedules')
+  //     .where('datetime', isLessThanOrEqualTo: now)
+  //     .where('isNotified', isEqualTo: false)
+  //     .get();
+
+  Future<void> _checkImmediateSchedules() async {
+    final now = DateTime.now();
+    final schedules = await FirebaseFirestore.instance
+        .collection('schedules')
+        .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+        .where('datetime', isLessThanOrEqualTo: now)
+        .get();
+
+    for (final doc in schedules.docs) {
+      NotificationService.scheduleNotification(
+        id: doc.id.hashCode,
+        title: 'Jadwal Sekarang: ${doc['title']}',
+        body: doc['description'],
+        scheduledTime: now,
+      );
+    }
+  }
+
+  void _startBackgroundTask() {
+    try{
+      Workmanager().initialize(
+        callbackDispatcher,
+        isInDebugMode: true,
+      );
+      Workmanager().registerPeriodicTask(
+        'schedule-checker',
+        'checkSchedules',
+        frequency: Duration(minutes: 15),  // Cek setiap 15 menit
+      );
+      print("jalanji");
+    }on PlatformException catch(e){
+      print("Task Gagal : ${e.message}");
+    }
+  }
+
+
+
   Future<void> _addSchedule() async {
     if (!_formKey.currentState!.validate() ||
         _selectedDate == null ||
@@ -45,7 +128,17 @@ class _HomeScreenState extends State<HomeScreen> {
       'userId': _user?.uid,
       'createdAt': FieldValue.serverTimestamp(),
       'isCompleted': false,
+      'isNotified' : false,
     });
+
+    await NotificationService.scheduleNotification(
+      id: dateTime.hashCode, // ID unik berdasarkan waktu
+      title: '⏰ ${_titleController.text}',
+      body: _descController.text.isNotEmpty
+          ? _descController.text
+          : 'Jadwal dimulai pada ${DateFormat('HH:mm').format(dateTime)}',
+      scheduledTime: dateTime,
+    );
 
     _titleController.clear();
     _descController.clear();
@@ -68,6 +161,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (date != null) {
       setState(() => _selectedDate = date);
     }
+
+    print(_selectedDate);
   }
 
   Future<void> _pickTime() async {
