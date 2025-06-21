@@ -44,15 +44,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _testNotification() async {
-    await NotificationService.showTestNotification();
-  }
+  // Future<void> _testNotification() async {
+  //   await NotificationService.showTestNotification();
+  // }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _testNotification();
+    // _testNotification();
     _requestExactAlarmPermission;
     _initNotifications();
     _startBackgroundTask();
@@ -77,15 +77,20 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('schedules')
         .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
         .where('datetime', isLessThanOrEqualTo: now)
+        .where('isNotified', isEqualTo: false)
         .get();
     for (final doc in schedules.docs) {
-      print("stecu");
-      NotificationService.scheduleNotification(
+      NotificationService.tampilNotifikasi(
         id: doc.id.hashCode,
-        title: 'Jadwal Sekarang: ${doc['title']}',
+        title: 'Jadwal Sekarang : ${doc['title']}',
         body: doc['description'],
-        scheduledTime: now,
       );
+      // NotificationService.scheduleNotification(
+      //   id: doc.id.hashCode,
+      //   title: 'Jadwal Sekarang: ${doc['title']}',
+      //   body: doc['description'],
+      //   scheduledTime: now,
+      // );
     }
   }
 
@@ -179,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('schedules')
         .doc(docId)
-        .update({'isCompleted': !currentStatus});
+        .update({'isCompleted': !currentStatus, 'isNotified': true});
   }
 
   Future<void> _deleteSchedule(String docId) async {

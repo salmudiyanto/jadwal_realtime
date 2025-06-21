@@ -17,16 +17,21 @@ class NotificationService {
   }
 
 
-  static Future<void> showTestNotification() async {
+
+  static Future<void> tampilNotifikasi({
+    required int id,
+    required String title,
+    required String body
+}) async {
     await _notifications.show(
-      999, // ID unik untuk notifikasi tes
-      '🎉 Tes Notifikasi Berhasil!',
-      'Ini adalah contoh notifikasi dari aplikasi Jadwal Anda',
+      id, // ID unik untuk notifikasi tes
+      title,
+      body,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'test_channel',
-          'Channel Tes',
-          channelDescription: 'Channel untuk notifikasi tes',
+          'jadwal realtime',
+          'channel',
+          channelDescription: 'Channel',
           importance: Importance.max,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
